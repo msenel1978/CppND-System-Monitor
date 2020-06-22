@@ -7,6 +7,7 @@
 #include "process.h"
 #include "processor.h"
 #include "system.h"
+#include "linux_parser.h"
 
 using std::set;
 using std::size_t;
@@ -19,14 +20,21 @@ Processor& System::Cpu() { return cpu_; }
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() { return processes_; }
 
-// TODO: Return the system's kernel identifier (string)
-std::string System::Kernel() { return string(); }
+// DONE (?): Return the system's kernel identifier (string)
+// TODO: Can this be done better?
+std::string System::Kernel() {
+
+    return LinuxParser::Kernel();
+}
 
 // TODO: Return the system's memory utilization
+// TODO: Can this be done better?
 float System::MemoryUtilization() { return 0.0; }
 
-// TODO: Return the operating system name
-std::string System::OperatingSystem() { return string(); }
+// DONE (?): Return the operating system name
+std::string System::OperatingSystem() {
+    return LinuxParser::OperatingSystem();
+}
 
 // TODO: Return the number of processes actively running on the system
 int System::RunningProcesses() { return 0; }
