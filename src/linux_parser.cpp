@@ -2,7 +2,9 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
-
+#include <cassert>
+#include <stdexcept>
+#include <iostream>
 #include "linux_parser.h"
 
 using std::stof;
@@ -67,7 +69,42 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() {
+  string line;
+  string key;
+  double value;
+  double mem_total, mem_used;
+  // /proc/meminfo
+  std::ifstream stream(kProcDirectory + kMeminfoFilename);
+
+  if (stream.is_open()) {
+    // Parse line-by-line
+    while (std::getline(stream, line)) {
+
+      std::istringstream linestream(line);
+      while (linestream >> key >> value) {
+	    if (key == "MemTotal:")
+		  mem_total = value;
+
+	    if (key == "MemFree:") {
+		  // Used memory = Total memory - Free Memory
+		  mem_used = mem_total - value;
+		  break;
+	    }
+	}
+    }
+  }
+  // To debug:std::cout << mem_total << "\t" << mem_used << "\n";
+  // If mem_total == 0, throw error
+  bool mem_total_zero{false};
+  if (mem_total == 0) {
+	throw std::range_error("Memory Total = 0");
+	mem_total_zero = true;
+	assert(mem_total_zero);
+  }
+  // Utilization = Used memory / Total Memory
+  return ( mem_used / mem_total );
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }
