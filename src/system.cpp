@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <cstddef>
+#include <iostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -31,11 +32,15 @@ float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 // DONE (?): Return the operating system name
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
-// TODO: Return the number of processes actively running on the system
+// DONE (?): Return the number of processes actively running on the system
 int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
 
 // DONE: Return the total number of processes on the system
 int System::TotalProcesses() { return (LinuxParser::TotalProcesses()); }
 
-// TODO: Return the number of seconds since the system started running
-long int System::UpTime() { return 0; }
+// DONE (?): Return the number of seconds since the system started running
+long int System::UpTime() {
+    long up_time = LinuxParser::UpTime();
+
+    return up_time;
+}
