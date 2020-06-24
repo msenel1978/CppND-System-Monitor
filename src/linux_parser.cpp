@@ -1,12 +1,12 @@
 #include "linux_parser.h"
 #include <dirent.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdlib.h>
 
 using std::stof;
 using std::string;
@@ -72,28 +72,27 @@ vector<int> LinuxParser::Pids() {
 // DONE: Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() {
   string line;
-  string key;
-  double value;
-  double mem_total, mem_used;
+  string key, value;
+  float mem_total, mem_used;
   // /proc/meminfo
   std::ifstream stream(kProcDirectory + kMeminfoFilename);
-
   if (stream.is_open()) {
     // Parse line-by-line
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
-      while (linestream >> key >> value) {
-        if (key == "MemTotal:") mem_total = value;
+      linestream >> key >> value;
+      if (key == "MemTotal:") mem_total = std::stof(value);
 
-        if (key == "MemFree:") {
-          // Used memory = Total memory - Free Memory
-          mem_used = mem_total - value;
-          break;
-        }
+      if (key == "MemFree:") {
+        // Used memory = Total memory - Free Memory
+        mem_used = mem_total - std::stof(value);
+        break;
       }
     }
   }
+
   // To debug:std::cout << mem_total << "\t" << mem_used << "\n";
+
   // If mem_total == 0, throw error
   bool mem_total_zero{false};
   if (mem_total == 0) {
@@ -103,6 +102,7 @@ float LinuxParser::MemoryUtilization() {
   }
   // Utilization = Used memory / Total Memory
   return (mem_used / mem_total);
+  // return (0.0);
 }
 
 // DONE: Read and return the system uptime
@@ -132,8 +132,29 @@ long LinuxParser::ActiveJiffies() { return 0; }
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() { return 0; }
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+// DONE: Read and return CPU utilization
+vector<string> LinuxParser::CpuUtilization() {
+  string line;
+  string cpu_line_values;
+  vector<string> cpu_values;
+
+  std::ifstream stream(kProcDirectory + kStatFilename);
+
+  if (stream.is_open()) {
+    // The first line is the "cpu" line
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+
+    // First field "cpu" discard
+    linestream >> cpu_line_values;
+    // Read the rest of the line to the vector
+    while (linestream >> cpu_line_values) cpu_values.push_back(cpu_line_values);
+  }
+  // for (int i = 0; i < cpu_values.size(); i++)
+  //	  std::cout << cpu_values[i] << "\t";
+  // std::cout << "\n";
+  return cpu_values;
+}
 
 // DONE: Read and return the total number of processes
 int LinuxParser::TotalProcesses() {
