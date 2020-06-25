@@ -125,33 +125,34 @@ long LinuxParser::Jiffies() {
   vector<string> system_jiffies = CpuUtilization();
 
   // According to:
-  // // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
+  // //
+  // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
   // Total Time = Busy + Idle =
   //		    = user (1) + nice (2) + system (3) + irq (6) +
   //		    + softirq (7) + steal (8) + idel (4) + iowait (5)
-  return (stol(system_jiffies[0]) + stol(system_jiffies[1]) +\
-		stol(system_jiffies[2]) + stol(system_jiffies[5]) +\
-		stol(system_jiffies[6]) + stol(system_jiffies[7]) +\
-		stol(system_jiffies[3]) + stol(system_jiffies[4])); 
+  return (stol(system_jiffies[0]) + stol(system_jiffies[1]) +
+          stol(system_jiffies[2]) + stol(system_jiffies[5]) +
+          stol(system_jiffies[6]) + stol(system_jiffies[7]) +
+          stol(system_jiffies[3]) + stol(system_jiffies[4]));
 }
 
 // DONE: Read and return the number of active jiffies for a PID
-long LinuxParser::ActiveJiffies(int pid) { 
+long LinuxParser::ActiveJiffies(int pid) {
   string line, values;
   vector<string> stat_values;
- 
+
   // /proc/PID/stat
   std::ifstream stream(kProcDirectory + to_string(pid) + kStatFilename);
- 
-  if (stream.is_open()) {
-	std::getline(stream, line);
-	std::istringstream linestream(line);  
 
-	while (linestream >> values) stat_values.push_back(values);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+
+    while (linestream >> values) stat_values.push_back(values);
   }
   // (14) utime +  (15) stime + (16) cutime + (17) cstime
-  return (stol(stat_values[13]) + stol(stat_values[14]) +\
-	    stol(stat_values[15]) + stol(stat_values[16])); 
+  return (stol(stat_values[13]) + stol(stat_values[14]) +
+          stol(stat_values[15]) + stol(stat_values[16]));
 }
 
 // TODO: Read and return the number of active jiffies for the system
@@ -177,13 +178,13 @@ vector<string> LinuxParser::CpuUtilization() {
 
     // First field "cpu" discard
     linestream >> cpu_line_values;
-    //std::cout << cpu_line_values;; 
+    // std::cout << cpu_line_values;;
     // Read the rest of the line to the vector
     while (linestream >> cpu_line_values) cpu_values.push_back(cpu_line_values);
   }
   /* For debug
   for (int i = 0; i < cpu_values.size(); i++)
-  	  std::cout << cpu_values[i] << "\t";
+          std::cout << cpu_values[i] << "\t";
   std::cout << "\n";
   */
   return cpu_values;
@@ -317,20 +318,20 @@ string LinuxParser::User(int pid) {
 }
 
 // DONE: Read and return the uptime of a process
-long LinuxParser::UpTime(int pid) { 
+long LinuxParser::UpTime(int pid) {
   string line, values;
   vector<string> stat_values;
- 
+
   // /proc/PID/stat
   std::ifstream stream(kProcDirectory + to_string(pid) + kStatFilename);
- 
-  if (stream.is_open()) {
-	std::getline(stream, line);
-	std::istringstream linestream(line);  
 
-	while (linestream >> values) stat_values.push_back(values);
-	// (22) starttime =  stat_values[21]
-	return UpTime() - (stol(stat_values[21]) / sysconf(_SC_CLK_TCK));
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+
+    while (linestream >> values) stat_values.push_back(values);
+    // (22) starttime =  stat_values[21]
+    return UpTime() - (stol(stat_values[21]) / sysconf(_SC_CLK_TCK));
   }
   // If starttime cannot be read for any reason
   return 0;

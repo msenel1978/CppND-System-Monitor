@@ -29,7 +29,7 @@ float Processor::Utilization() {
 
   // According to
   // https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
-  busy_time = user_time + nice_time + system_time + irq_time + softirq_time +\
+  busy_time = user_time + nice_time + system_time + irq_time + softirq_time +
               steal_time;
 
   // total_time = busy + idle
@@ -42,7 +42,7 @@ float Processor::Utilization() {
   // Update private previous values
   this->prev_total = total_time;
   this->prev_busy = busy_time;
- 
+
   // Prevent divide by 0
   // TODO: A warning or assert
   if (delta_total_time != 0)

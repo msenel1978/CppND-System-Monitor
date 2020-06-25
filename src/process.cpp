@@ -23,8 +23,8 @@ int Process::Pid() { return pid_; }
 
 // DONE: Return this process's CPU utilization
 float Process::CpuUtilization() {
-    return ((float)LinuxParser::ActiveJiffies(pid_)\
-		/ (float)LinuxParser::Jiffies());
+  return ((float)LinuxParser::ActiveJiffies(pid_) /
+          (float)LinuxParser::Jiffies());
 }
 
 // DONE: Return the command that generated this process
@@ -40,6 +40,6 @@ string Process::User() { return user_; }
 long int Process::UpTime() { return LinuxParser::UpTime(pid_); }
 
 // DONE: Overload the "less than" comparison operator for Process objects
-bool Process::operator<(Process& a) { 
-    return (this->CpuUtilization() < a.CpuUtilization());
+bool Process::operator<(Process& a) {
+  return (this->CpuUtilization() < a.CpuUtilization());
 }
